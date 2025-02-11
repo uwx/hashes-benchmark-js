@@ -1,0 +1,41 @@
+# Simple workflow for deploying static content to GitHub Pages
+name: Run benchmarks
+
+on:
+  # Runs on pushes targeting the default branch
+  push:
+    branches: ["main"]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  # Single deploy job since we're just deploying
+  bench:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - uses: pnpm/action-setup@v3
+        name: Install pnpm
+        with:
+          version: 'pnpm@9.15.4+sha512.b2dc20e2fc72b3e18848459b37359a32064663e5627a51e4c74b2c29dd8e8e0491483c3abb40789cfd578bf362fb6ba8261b05f0387d76792ed6e23ea3b1b6a0'
+          run_install: false
+
+      - uses: actions/setup-node@v4
+        name: Setup node
+        with:
+          node-version: latest
+          cache: 'pnpm'
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Install dependencies
+        run: |
+          pnpm install
+
+      - name: Build SPA
+        run: |
+          pnpx tsx src/index.ts
