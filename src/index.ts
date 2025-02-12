@@ -1,3 +1,5 @@
+import { run, bench, boxplot, summary } from 'mitata';
+
 import * as crypto from 'node:crypto';
 import * as XXHash from 'xxhash';
 import * as murmurhashNative from 'murmurhash-native';
@@ -59,202 +61,182 @@ for (let i = 0; i < arr.length; i++) {
 }
 sarr = [sarr.join('')];
 
-import Benchmark from 'benchmark';
-const suite = new Benchmark.Suite();
-
 // add tests
-suite
-    .add('xxhash (buffer)', () => {
-        const hasher = new XXHash.XXHash64(0);
-        for (let i = 0; i < arr.length; i++) {
-            hasher.update(arr[i]);
-        }
-        hasher.digest();
-    })
+bench('hash-wasm adler32 (buffer)', async () => { return doHash(await hashWasm_createAdler32(), arr[0]) });
+bench('hash-wasm blake2b (buffer)', async () => { return doHash(await hashWasm_createBLAKE2b(), arr[0]) });
+bench('hash-wasm blake2s (buffer)', async () => { return doHash(await hashWasm_createBLAKE2s(), arr[0]) });
+bench('hash-wasm blake3 (buffer)', async () => { return doHash(await hashWasm_createBLAKE3(), arr[0]) });
+bench('hash-wasm crc32 (buffer)', async () => { return doHash(await hashWasm_createCRC32(), arr[0]) });
+bench('hash-wasm crc64 (buffer)', async () => { return doHash(await hashWasm_createCRC64(), arr[0]) });
+bench('hash-wasm keccak (buffer)', async () => { return doHash(await hashWasm_createKeccak(), arr[0]) });
+bench('hash-wasm md4 (buffer)', async () => { return doHash(await hashWasm_createMD4(), arr[0]) });
+bench('hash-wasm md5 (buffer)', async () => { return doHash(await hashWasm_createMD5(), arr[0]) });
+bench('hash-wasm ripemd160 (buffer)', async () => { return doHash(await hashWasm_createRIPEMD160(), arr[0]) });
+bench('hash-wasm sha1 (buffer)', async () => { return doHash(await hashWasm_createSHA1(), arr[0]) });
+bench('hash-wasm sha224 (buffer)', async () => { return doHash(await hashWasm_createSHA224(), arr[0]) });
+bench('hash-wasm sha256 (buffer)', async () => { return doHash(await hashWasm_createSHA256(), arr[0]) });
+bench('hash-wasm sha3 (buffer)', async () => { return doHash(await hashWasm_createSHA3(), arr[0]) });
+bench('hash-wasm sha384 (buffer)', async () => { return doHash(await hashWasm_createSHA384(), arr[0]) });
+bench('hash-wasm sha512 (buffer)', async () => { return doHash(await hashWasm_createSHA512(), arr[0]) });
+bench('hash-wasm sm3 (buffer)', async () => { return doHash(await hashWasm_createSM3(), arr[0]) });
+bench('hash-wasm whirlpool (buffer)', async () => { return doHash(await hashWasm_createWhirlpool(), arr[0]) });
+bench('hash-wasm xxhash32 (buffer)', async () => { return doHash(await hashWasm_createXXHash32(), arr[0]) });
+bench('hash-wasm xxhash64 (buffer)', async () => { return doHash(await hashWasm_createXXHash64(), arr[0]) });
+bench('hash-wasm xxhash3 (buffer)', async () => { return doHash(await hashWasm_createXXHash3(), arr[0]) });
+bench('hash-wasm xxhash128 (buffer)', async () => { return doHash(await hashWasm_createXXHash128(), arr[0]) });
 
-    .add('nodejs crypto md5 (buffer)', () => {
-        const hasher = crypto.createHash('md5');
-        for (let i = 0; i < arr.length; i++) {
-            hasher.update(arr[i]);
-        }
-        hasher.digest('hex');
-    })
+bench('xxhash (buffer)', () => {
+    const hasher = new XXHash.XXHash64(0);
+    for (let i = 0; i < arr.length; i++) {
+        hasher.update(arr[i]);
+    }
+    return hasher.digest();
+})
 
-    .add('nodejs crypto md4 (buffer)', () => {
-        const hasher = crypto.createHash('md4');
-        for (let i = 0; i < arr.length; i++) {
-            hasher.update(arr[i]);
-        }
-        hasher.digest('hex');
-    })
+bench('nodejs crypto md5 (buffer)', () => {
+    const hasher = crypto.createHash('md5');
+    for (let i = 0; i < arr.length; i++) {
+        hasher.update(arr[i]);
+    }
+    return hasher.digest('hex');
+})
 
-    .add('nodejs crypto sha256 (buffer)', () => {
-        const hasher = crypto.createHash('sha256');
-        for (let i = 0; i < arr.length; i++) {
-            hasher.update(arr[i]);
-        }
-        hasher.digest('hex');
-    })
+bench('nodejs crypto md4 (buffer)', () => {
+    const hasher = crypto.createHash('md4');
+    for (let i = 0; i < arr.length; i++) {
+        hasher.update(arr[i]);
+    }
+    return hasher.digest('hex');
+})
 
-    .add('nodejs crypto sha512 (buffer)', () => {
-        const hasher = crypto.createHash('sha512');
-        for (let i = 0; i < arr.length; i++) {
-            hasher.update(arr[i]);
-        }
-        hasher.digest('hex');
-    })
+bench('nodejs crypto sha256 (buffer)', () => {
+    const hasher = crypto.createHash('sha256');
+    for (let i = 0; i < arr.length; i++) {
+        hasher.update(arr[i]);
+    }
+    return hasher.digest('hex');
+})
 
-    .add('nodejs crypto SHA3-256 (buffer)', () => {
-        const hasher = crypto.createHash('SHA3-256');
-        for (let i = 0; i < arr.length; i++) {
-            hasher.update(arr[i]);
-        }
-        hasher.digest('hex');
-    })
+bench('nodejs crypto sha512 (buffer)', () => {
+    const hasher = crypto.createHash('sha512');
+    for (let i = 0; i < arr.length; i++) {
+        hasher.update(arr[i]);
+    }
+    return hasher.digest('hex');
+})
 
-    .add('nodejs crypto BLAKE2b512 (buffer)', () => {
-        const hasher = crypto.createHash('BLAKE2b512');
-        for (let i = 0; i < arr.length; i++) {
-            hasher.update(arr[i]);
-        }
-        hasher.digest('hex');
-    })
+bench('nodejs crypto SHA3-256 (buffer)', () => {
+    const hasher = crypto.createHash('SHA3-256');
+    for (let i = 0; i < arr.length; i++) {
+        hasher.update(arr[i]);
+    }
+    return hasher.digest('hex');
+})
 
-    .add('nodejs crypto BLAKE2s256 (buffer)', () => {
-        const hasher = crypto.createHash('BLAKE2s256');
-        for (let i = 0; i < arr.length; i++) {
-            hasher.update(arr[i]);
-        }
-        hasher.digest('hex');
-    })
+bench('nodejs crypto BLAKE2b512 (buffer)', () => {
+    const hasher = crypto.createHash('BLAKE2b512');
+    for (let i = 0; i < arr.length; i++) {
+        hasher.update(arr[i]);
+    }
+    return hasher.digest('hex');
+})
 
-    .add('SparkMD5 (string)', () => {
-        const hasher = new SparkMD5();
-        for (let i = 0; i < sarr.length; i++) {
-            hasher.append(sarr[i]);
-        }
-        hasher.end();
-    })
+bench('nodejs crypto BLAKE2s256 (buffer)', () => {
+    const hasher = crypto.createHash('BLAKE2s256');
+    for (let i = 0; i < arr.length; i++) {
+        hasher.update(arr[i]);
+    }
+    return hasher.digest('hex');
+})
 
-    .add('murmurhash-native (string)', () => {
-        const hasher = murmurhashNativeStream.createHash('murmurHash128');
-        for (let i = 0; i < arr.length; i++) {
-            hasher.update(arr[i]);
-        }
-        hasher.digest('hex');
-    })
+bench('SparkMD5 (string)', () => {
+    const hasher = new SparkMD5();
+    for (let i = 0; i < sarr.length; i++) {
+        hasher.append(sarr[i]);
+    }
+    return hasher.end();
+})
 
-    .add('imurmurhash (string)', () => {
-        const hasher = ImurmurHash3();
-        for (let i = 0; i < sarr.length; i++) {
-            hasher.hash(sarr[i]);
-        }
-        hasher.result();
-    })
+bench('murmurhash-native (string)', () => {
+    const hasher = murmurhashNativeStream.createHash('murmurHash128');
+    for (let i = 0; i < arr.length; i++) {
+        hasher.update(arr[i]);
+    }
+    return hasher.digest('hex');
+})
 
-    .add('xxhash (buffer)', () => {
-        const hasher = murmurhashNativeStream.createHash('murmurHash128');
-        for (let i = 0; i < arr.length; i++) {
-            hasher.update(arr[i]);
-        }
-        hasher.digest('hex');
-    })
+bench('imurmurhash (string)', () => {
+    const hasher = ImurmurHash3();
+    for (let i = 0; i < sarr.length; i++) {
+        hasher.hash(sarr[i]);
+    }
+    return hasher.result();
+})
 
-    .add('multihashes identity (buffer)', () => { multihashEncode(arr[0], 'identity') })
-    .add('multihashes sha1 (buffer)', () => { multihashEncode(arr[0], 'sha1') })
-    .add('multihashes sha2-512 (buffer)', () => { multihashEncode(arr[0], 'sha2-512') })
-    .add('multihashes sha3-512 (buffer)', () => { multihashEncode(arr[0], 'sha3-512') })
-    .add('multihashes shake-128 (buffer)', () => { multihashEncode(arr[0], 'shake-128') })
-    .add('multihashes shake-256 (buffer)', () => { multihashEncode(arr[0], 'shake-256') })
-    .add('multihashes keccak-224 (buffer)', () => { multihashEncode(arr[0], 'keccak-224') })
-    .add('multihashes keccak-256 (buffer)', () => { multihashEncode(arr[0], 'keccak-256') })
-    .add('multihashes keccak-384 (buffer)', () => { multihashEncode(arr[0], 'keccak-384') })
-    .add('multihashes keccak-512 (buffer)', () => { multihashEncode(arr[0], 'keccak-512') })
-    .add('multihashes blake3 (buffer)', () => { multihashEncode(arr[0], 'blake3') })
-    .add('multihashes murmur3-128 (buffer)', () => { multihashEncode(arr[0], 'murmur3-128') })
-    .add('multihashes murmur3-32 (buffer)', () => { multihashEncode(arr[0], 'murmur3-32') })
-    .add('multihashes dbl-sha2-256 (buffer)', () => { multihashEncode(arr[0], 'dbl-sha2-256') })
-    .add('multihashes md4 (buffer)', () => { multihashEncode(arr[0], 'md4') })
-    .add('multihashes md5 (buffer)', () => { multihashEncode(arr[0], 'md5') })
-    .add('multihashes bmt (buffer)', () => { multihashEncode(arr[0], 'bmt') })
-    .add('multihashes sha2-256-trunc254-padded (buffer)', () => { multihashEncode(arr[0], 'sha2-256-trunc254-padded') })
-    .add('multihashes ripemd-128 (buffer)', () => { multihashEncode(arr[0], 'ripemd-128') })
-    .add('multihashes ripemd-160 (buffer)', () => { multihashEncode(arr[0], 'ripemd-160') })
-    .add('multihashes ripemd-256 (buffer)', () => { multihashEncode(arr[0], 'ripemd-256') })
-    .add('multihashes ripemd-320 (buffer)', () => { multihashEncode(arr[0], 'ripemd-320') })
-    .add('multihashes x11 (buffer)', () => { multihashEncode(arr[0], 'x11') })
-    .add('multihashes kangarootwelve (buffer)', () => { multihashEncode(arr[0], 'kangarootwelve') })
-    .add('multihashes sm3-256 (buffer)', () => { multihashEncode(arr[0], 'sm3-256') })
-    .add('multihashes blake2b-64 (buffer)', () => { multihashEncode(arr[0], 'blake2b-64') })
-    .add('multihashes blake2b-128 (buffer)', () => { multihashEncode(arr[0], 'blake2b-128') })
-    .add('multihashes blake2b-256 (buffer)', () => { multihashEncode(arr[0], 'blake2b-256') })
-    .add('multihashes blake2b-512 (buffer)', () => { multihashEncode(arr[0], 'blake2b-512') })
-    .add('multihashes blake2s-64 (buffer)', () => { multihashEncode(arr[0], 'blake2s-64') })
-    .add('multihashes blake2s-128 (buffer)', () => { multihashEncode(arr[0], 'blake2s-128') })
-    .add('multihashes blake2s-256 (buffer)', () => { multihashEncode(arr[0], 'blake2s-256') })
-    .add('multihashes skein256-256 (buffer)', () => { multihashEncode(arr[0], 'skein256-256') })
-    .add('multihashes skein512-512 (buffer)', () => { multihashEncode(arr[0], 'skein512-512') })
-    .add('multihashes skein1024-1024 (buffer)', () => { multihashEncode(arr[0], 'skein1024-1024') })
-    .add('multihashes poseidon-bls12_381-a2-fc1 (buffer)', () => { multihashEncode(arr[0], 'poseidon-bls12_381-a2-fc1') })
-    .add('multihashes poseidon-bls12_381-a2-fc1-sc (buffer)', () => { multihashEncode(arr[0], 'poseidon-bls12_381-a2-fc1-sc') })
+bench('xxhash (buffer)', () => {
+    const hasher = murmurhashNativeStream.createHash('murmurHash128');
+    for (let i = 0; i < arr.length; i++) {
+        hasher.update(arr[i]);
+    }
+    return hasher.digest('hex');
+})
 
-    .add('multiformats sha1 (buffer)', async () => { await sha1.digest(arr[0],) })
-    .add('multiformats sha256 (buffer)', async () => { await sha256.digest(arr[0]) })
-    .add('multiformats sha512 (buffer)', async () => { await sha512.digest(arr[0]) })
+bench('multihashes identity (buffer)', () => { return multihashEncode(arr[0], 'identity') })
+bench('multihashes sha1 (buffer)', () => { return multihashEncode(arr[0], 'sha1') })
+bench('multihashes sha2-512 (buffer)', () => { return multihashEncode(arr[0], 'sha2-512') })
+bench('multihashes sha3-512 (buffer)', () => { return multihashEncode(arr[0], 'sha3-512') })
+bench('multihashes shake-128 (buffer)', () => { return multihashEncode(arr[0], 'shake-128') })
+bench('multihashes shake-256 (buffer)', () => { return multihashEncode(arr[0], 'shake-256') })
+bench('multihashes keccak-224 (buffer)', () => { return multihashEncode(arr[0], 'keccak-224') })
+bench('multihashes keccak-256 (buffer)', () => { return multihashEncode(arr[0], 'keccak-256') })
+bench('multihashes keccak-384 (buffer)', () => { return multihashEncode(arr[0], 'keccak-384') })
+bench('multihashes keccak-512 (buffer)', () => { return multihashEncode(arr[0], 'keccak-512') })
+bench('multihashes blake3 (buffer)', () => { return multihashEncode(arr[0], 'blake3') })
+bench('multihashes murmur3-128 (buffer)', () => { return multihashEncode(arr[0], 'murmur3-128') })
+bench('multihashes murmur3-32 (buffer)', () => { return multihashEncode(arr[0], 'murmur3-32') })
+bench('multihashes dbl-sha2-256 (buffer)', () => { return multihashEncode(arr[0], 'dbl-sha2-256') })
+bench('multihashes md4 (buffer)', () => { return multihashEncode(arr[0], 'md4') })
+bench('multihashes md5 (buffer)', () => { return multihashEncode(arr[0], 'md5') })
+bench('multihashes bmt (buffer)', () => { return multihashEncode(arr[0], 'bmt') })
+bench('multihashes sha2-256-trunc254-padded (buffer)', () => { return multihashEncode(arr[0], 'sha2-256-trunc254-padded') })
+bench('multihashes ripemd-128 (buffer)', () => { return multihashEncode(arr[0], 'ripemd-128') })
+bench('multihashes ripemd-160 (buffer)', () => { return multihashEncode(arr[0], 'ripemd-160') })
+bench('multihashes ripemd-256 (buffer)', () => { return multihashEncode(arr[0], 'ripemd-256') })
+bench('multihashes ripemd-320 (buffer)', () => { return multihashEncode(arr[0], 'ripemd-320') })
+bench('multihashes x11 (buffer)', () => { return multihashEncode(arr[0], 'x11') })
+bench('multihashes kangarootwelve (buffer)', () => { return multihashEncode(arr[0], 'kangarootwelve') })
+bench('multihashes sm3-256 (buffer)', () => { return multihashEncode(arr[0], 'sm3-256') })
+bench('multihashes blake2b-64 (buffer)', () => { return multihashEncode(arr[0], 'blake2b-64') })
+bench('multihashes blake2b-128 (buffer)', () => { return multihashEncode(arr[0], 'blake2b-128') })
+bench('multihashes blake2b-256 (buffer)', () => { return multihashEncode(arr[0], 'blake2b-256') })
+bench('multihashes blake2b-512 (buffer)', () => { return multihashEncode(arr[0], 'blake2b-512') })
+bench('multihashes blake2s-64 (buffer)', () => { return multihashEncode(arr[0], 'blake2s-64') })
+bench('multihashes blake2s-128 (buffer)', () => { return multihashEncode(arr[0], 'blake2s-128') })
+bench('multihashes blake2s-256 (buffer)', () => { return multihashEncode(arr[0], 'blake2s-256') })
+bench('multihashes skein256-256 (buffer)', () => { return multihashEncode(arr[0], 'skein256-256') })
+bench('multihashes skein512-512 (buffer)', () => { return multihashEncode(arr[0], 'skein512-512') })
+bench('multihashes skein1024-1024 (buffer)', () => { return multihashEncode(arr[0], 'skein1024-1024') })
+bench('multihashes poseidon-bls12_381-a2-fc1 (buffer)', () => { return multihashEncode(arr[0], 'poseidon-bls12_381-a2-fc1') })
+bench('multihashes poseidon-bls12_381-a2-fc1-sc (buffer)', () => { return multihashEncode(arr[0], 'poseidon-bls12_381-a2-fc1-sc') })
+
+bench('multiformats sha1 (buffer)', async () => { return await sha1.digest(arr[0],) })
+bench('multiformats sha256 (buffer)', async () => { return await sha256.digest(arr[0]) })
+bench('multiformats sha512 (buffer)', async () => { return await sha512.digest(arr[0]) })
     
-    .add('multiformats keccak224 (buffer)', async () => { await sha512.digest(arr[0]) })
-    .add('multiformats sha512 (buffer)', async () => { await sha512.digest(arr[0]) })
-    .add('multiformats sha512 (buffer)', async () => { await sha512.digest(arr[0]) })
-    .add('multiformats sha512 (buffer)', async () => { await sha512.digest(arr[0]) })
-    .add('multiformats sha512 (buffer)', async () => { await sha512.digest(arr[0]) })
-    .add('multiformats sha512 (buffer)', async () => { await sha512.digest(arr[0]) })
-    .add('multiformats sha512 (buffer)', async () => { await sha512.digest(arr[0]) })
-    .add('multiformats sha512 (buffer)', async () => { await sha512.digest(arr[0]) })
-    .add('multiformats keccak224 (buffer)', async () => { await keccak224.digest(arr[0]) })
-    .add('multiformats keccak256 (buffer)', async () => { await keccak256.digest(arr[0]) })
-    .add('multiformats keccak384 (buffer)', async () => { await keccak384.digest(arr[0]) })
-    .add('multiformats keccak512 (buffer)', async () => { await keccak512.digest(arr[0]) })
-    .add('multiformats sha3224 (buffer)', async () => { await sha3224.digest(arr[0]) })
-    .add('multiformats sha3256 (buffer)', async () => { await sha3256.digest(arr[0]) })
-    .add('multiformats sha3384 (buffer)', async () => { await sha3384.digest(arr[0]) })
-    .add('multiformats sha3512 (buffer)', async () => { await sha3512.digest(arr[0]) })
-    .add('multiformats shake128 (buffer)', async () => { await shake128.digest(arr[0]) })
-    .add('multiformats shake256  (buffer)', async () => { await shake256 .digest(arr[0]) })
-    .add('multiformats murmur332 (buffer)', async () => { await murmur332.digest(arr[0]) })
-    .add('multiformats murmur364 (buffer)', async () => { await murmur364.digest(arr[0]) })
-    .add('multiformats murmur3128 (buffer)', async () => { await murmur3128.digest(arr[0]) })
-    .add('multiformats blake2.blake2b (buffer)', async () => { await blake2.blake2b.blake2b512.digest(arr[0]) })
-    .add('multiformats blake2.blake2s (buffer)', async () => { await blake2.blake2s.blake2s256.digest(arr[0]) })
+bench('multiformats keccak224 (buffer)', async () => { return await keccak224.digest(arr[0]) })
+bench('multiformats keccak256 (buffer)', async () => { return await keccak256.digest(arr[0]) })
+bench('multiformats keccak384 (buffer)', async () => { return await keccak384.digest(arr[0]) })
+bench('multiformats keccak512 (buffer)', async () => { return await keccak512.digest(arr[0]) })
+bench('multiformats sha3224 (buffer)', async () => { return await sha3224.digest(arr[0]) })
+bench('multiformats sha3256 (buffer)', async () => { return await sha3256.digest(arr[0]) })
+bench('multiformats sha3384 (buffer)', async () => { return await sha3384.digest(arr[0]) })
+bench('multiformats sha3512 (buffer)', async () => { return await sha3512.digest(arr[0]) })
+bench('multiformats shake128 (buffer)', async () => { return await shake128.digest(arr[0]) })
+bench('multiformats shake256  (buffer)', async () => { return await shake256 .digest(arr[0]) })
+bench('multiformats murmur332 (buffer)', async () => { return await murmur332.digest(arr[0]) })
+bench('multiformats murmur364 (buffer)', async () => { return await murmur364.digest(arr[0]) })
+bench('multiformats murmur3128 (buffer)', async () => { return await murmur3128.digest(arr[0]) })
+bench('multiformats blake2.blake2b (buffer)', async () => { return await blake2.blake2b.blake2b512.digest(arr[0]) })
+bench('multiformats blake2.blake2s (buffer)', async () => { return await blake2.blake2s.blake2s256.digest(arr[0]) })
 
-    .add('hash-wasm adler32 (buffer)', async () => { doHash(await hashWasm_createAdler32(), arr[0]) })
-    .add('hash-wasm blake2b (buffer)', async () => { doHash(await hashWasm_createBLAKE2b(), arr[0]) })
-    .add('hash-wasm blake2s (buffer)', async () => { doHash(await hashWasm_createBLAKE2s(), arr[0]) })
-    .add('hash-wasm blake3 (buffer)', async () => { doHash(await hashWasm_createBLAKE3(), arr[0]) })
-    .add('hash-wasm crc32 (buffer)', async () => { doHash(await hashWasm_createCRC32(), arr[0]) })
-    .add('hash-wasm crc64 (buffer)', async () => { doHash(await hashWasm_createCRC64(), arr[0]) })
-    .add('hash-wasm keccak (buffer)', async () => { doHash(await hashWasm_createKeccak(), arr[0]) })
-    .add('hash-wasm md4 (buffer)', async () => { doHash(await hashWasm_createMD4(), arr[0]) })
-    .add('hash-wasm md5 (buffer)', async () => { doHash(await hashWasm_createMD5(), arr[0]) })
-    .add('hash-wasm ripemd160 (buffer)', async () => { doHash(await hashWasm_createRIPEMD160(), arr[0]) })
-    .add('hash-wasm sha1 (buffer)', async () => { doHash(await hashWasm_createSHA1(), arr[0]) })
-    .add('hash-wasm sha224 (buffer)', async () => { doHash(await hashWasm_createSHA224(), arr[0]) })
-    .add('hash-wasm sha256 (buffer)', async () => { doHash(await hashWasm_createSHA256(), arr[0]) })
-    .add('hash-wasm sha3 (buffer)', async () => { doHash(await hashWasm_createSHA3(), arr[0]) })
-    .add('hash-wasm sha384 (buffer)', async () => { doHash(await hashWasm_createSHA384(), arr[0]) })
-    .add('hash-wasm sha512 (buffer)', async () => { doHash(await hashWasm_createSHA512(), arr[0]) })
-    .add('hash-wasm sm3 (buffer)', async () => { doHash(await hashWasm_createSM3(), arr[0]) })
-    .add('hash-wasm whirlpool (buffer)', async () => { doHash(await hashWasm_createWhirlpool(), arr[0]) })
-    .add('hash-wasm xxhash32 (buffer)', async () => { doHash(await hashWasm_createXXHash32(), arr[0]) })
-    .add('hash-wasm xxhash64 (buffer)', async () => { doHash(await hashWasm_createXXHash64(), arr[0]) })
-    .add('hash-wasm xxhash3 (buffer)', async () => { doHash(await hashWasm_createXXHash3(), arr[0]) })
-    .add('hash-wasm xxhash128 (buffer)', async () => { doHash(await hashWasm_createXXHash128(), arr[0]) })
-
-    // add listeners
-    .on('cycle', (event: Event) => {
-        console.log(String(event.target));
-    })
-    .on('complete', function (this: typeof Benchmark) {
-        console.log(`Fastest is ${this.filter('fastest').map('name')}`);
-    })
-    // run async
-    .run({ async: true });
+await run();
