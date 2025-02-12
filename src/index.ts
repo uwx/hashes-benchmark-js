@@ -62,6 +62,8 @@ for (let i = 0; i < arr.length; i++) {
 sarr = [sarr.join('')];
 
 // add tests
+boxplot(() => {
+    summary(() => {
 bench('hash-wasm adler32 (buffer)', async () => { return doHash(await hashWasm_createAdler32(), arr[0]) });
 bench('hash-wasm blake2b (buffer)', async () => { return doHash(await hashWasm_createBLAKE2b(), arr[0]) });
 bench('hash-wasm blake2s (buffer)', async () => { return doHash(await hashWasm_createBLAKE2s(), arr[0]) });
@@ -173,7 +175,7 @@ bench('imurmurhash (string)', () => {
     return hasher.result();
 })
 
-bench('xxhash (buffer)', () => {
+bench('murmurhash-native (buffer)', () => {
     const hasher = murmurhashNativeStream.createHash('murmurHash128');
     for (let i = 0; i < arr.length; i++) {
         hasher.update(arr[i]);
@@ -238,5 +240,7 @@ bench('multiformats murmur364 (buffer)', async () => { return await murmur364.di
 bench('multiformats murmur3128 (buffer)', async () => { return await murmur3128.digest(arr[0]) })
 bench('multiformats blake2.blake2b (buffer)', async () => { return await blake2.blake2b.blake2b512.digest(arr[0]) })
 bench('multiformats blake2.blake2s (buffer)', async () => { return await blake2.blake2s.blake2s256.digest(arr[0]) })
+    })
+})
 
 await run();
